@@ -1,0 +1,23 @@
+cd /path/to/your/plink/files
+# Merge files
+cat 1.fam > plink.fam
+for chr in {1..22}; do cat $chr.bim; done > plink.bim
+(echo -en "\x6C\x1B\x01"; for chr in {1..22}; do tail -c +4 $chr.bed; done) > plink.bed
+
+# Prepare eigensoft
+wget https://data.broadinstitute.org/alkesgroup/EIGENSOFT/EIG-6.1.4.tar.gz
+tar xzvf EIG-6.1.4.tar.gz
+chmod 777 -R ./EIG-6.1.4/bin
+
+# replace line 58 of ./EIG-6.1.4/bin/smartpca.perl
+# ("$command = "smartpca";" to "$command = "./smartpca";")
+# (using vi, but propably also feasible in command line with sed or else)
+
+mv ./plink.* ./EIG-6.1.4/bin/
+
+# run pca (using nohup so that you don't need to keep your shell open for hours ...)
+nohup  ./EIG-6.1.4/bin/smartpca.perl -i plink.bed -a plink.bim -b plink.fam -p plink.pca -e plink.eval -o plink.pca -l plink.log &
+
+mkdir ./EIG-6.1.4/bin/Results
+mv ./EIG-6.1.4/bin/plink.* ./EIG-6.1.4/bin/Results
+zip -9 -r ./EIG-6.1.4/bin/Results.zip ./EIG-6.1.4/bin/Results/

@@ -1,0 +1,1 @@
+./plink --bfile plink --linear --pheno height.csv --covar all_filtered_covariates.txt --covar-name sex-pop5 --allow-no-sex --hwe 0.00001 --maf 0.01 --mind 0.1 --geno 0.1
